@@ -65,8 +65,8 @@ class Matrix
         {
             output.arr[i] = output._bufferArr[i];
         }
-
     }
+    
 
     /**
      * @param {Matrix} input 
@@ -317,6 +317,17 @@ class SquareMatrix extends Matrix
 
         return [Q,R];
     }
+
+    determinant()
+    {
+        let qr = this.QRDecomposition();
+        let out = 1;
+        for(let i = 0; i < this.height; i++)
+        {
+            out *= qr[1].arr[i+i*this.height];
+        }
+        return out;
+    }
     givensEigen()
     {
         for(let y = 1; y < this.size; y++)
@@ -465,6 +476,44 @@ class SquareMatrix extends Matrix
 
         updated.log();
         q_total.log();
+    }
+    trace()
+    {
+        let out = 0;
+
+        for(let i = 0; i < this.height; i++)
+        {
+            out += this.arr[i+i*this.height];
+        }
+        return out;
+    }
+    polynomial()
+    {
+        let coeffs = [1];
+        let M = new SquareMatrix(this.height);
+        M.identity();
+
+        for(let k = 1; k < this.height+1; k++)
+        {
+            this.mul(M,M);
+            let c = -(1/k) * M.trace();
+            M.addIdentity(c);
+            coeffs.push(c);
+        }
+        let out = [];
+        for(let i = 0; i < this.height+1; i++)
+        {
+            out.push(coeffs[this.height-i]);
+        }
+        return out;
+            
+    }
+    addIdentity(value)
+    {
+        for(let i = 0; i < this.height; i++)
+        {
+            this.arr[i+i*this.height] += value;
+        }
     }
     get size()
     {

@@ -1,58 +1,33 @@
- 
-let xhr = new XMLHttpRequest()
-xhr.open("GET","imgs.bin");
-xhr.responseType = "arraybuffer";
+let n = 10;
+let A = new SquareMatrix(n);
+
+// let M = new SquareMatrix(4);
+// M.identity();
+
+
+// let coeffs = [1];
+
+// for(let i = 0; i < n*n; i++)
+// {
+//     A.arr[i] = Math.random()*2-1;
+// }
+
+let det = A.determinant();
+let tr = A.trace();
+let scale = 1;
+A.scale(1/Math.pow(det,1/n))
+
+let vec0 = new Vector(n);
+let vec1 = new Vector(n);
 
 
 
 
-xhr.onload = ()=>{
-    window.images = new Uint8Array(xhr.response);
-    main();
-};
-xhr.send();
 
-let can = document.createElement("canvas");
-can.width = 92;
-can.height = 112;
-document.body.appendChild(can);
-let ctx = can.getContext("2d");
-
-
-let imageDataset = new Matrix(320,10304);;
-function main()
-{
-    for(let i = 0; i < images.length; i++)
-    {
-        imageDataset.arr[i] = images[i]/255;
-    }
-}
-
-let imageNum = 0;
-function drawImage()
-{
-    ctx.clearRect(0,0,can.width,can.height);
-    for(let y = 0; y < can.height; y++)
-    {
-        for(let x = 0; x < can.width; x++)
-        {
-            let i = (y+x*can.height)*320+imageNum;
-            ctx.fillStyle = `rgb(${images[i]},${images[i]},${images[i]})`;
-            ctx.fillRect(x,y,1,1);
-        }
-    }
-    imageNum++;
-}
-
-let sqMatTest = new Matrix(4,8);
-let test = new Matrix(4,8);
-
-for(let i = 0; i < sqMatTest.arr.length; i++)
-{
-    sqMatTest.arr[i] = Math.random()*2-1;
-}
-
-let SVD = sqMatTest.SVD();
-
-SVD[0].mul(SVD[1],test);
-test.mul(SVD[2],test);
+// for(let k = 1; k < 5; k++)
+// {
+//     A.mul(M,M);
+//     let c = -(1/k) * M.trace();
+//     M.addIdentity(c);
+//     coeffs.push(c);
+// }
