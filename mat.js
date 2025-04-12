@@ -260,6 +260,20 @@ class Matrix
         
         return [U,S,V];
     }
+
+    
+
+    /**
+     * @param {Number} row0 src row index
+     * @param {Number} row1 dest row index
+     */
+    addScaleRow(scale, row0, row1)
+    {
+        for(let i = 0; i < this.width; i++)
+        {
+            this.arr[row1*this.width+i] += this.arr[row0*this.width+i]*scale;
+        }
+    }
 }
 
 class SquareMatrix extends Matrix
@@ -515,6 +529,80 @@ class SquareMatrix extends Matrix
             this.arr[i+i*this.height] += value;
         }
     }
+
+    /**
+     * 
+     * @param {SquareMatrix} dst 
+     * @param {Boolean} debug 
+     * @returns 
+     */
+    invert(dst,debug=false)
+    {        
+        let proccesingMat = this.clone();
+        dst.identity();
+
+        //bottom half
+        for(let x = 0; x < this.width; x++)
+        {
+            // Move highest number in column to the current slot and scale to 1
+            {
+                let iiVal = proccesingMat.getItem(x,x);
+                let bestVal = 0;
+                let bestY = 0;
+                for(let y = x; y < this.width; y++)
+                {
+                    let val = proccesingMat.getItem(x,y);
+                    if(Math.abs(val)>Math.abs(bestVal))
+                    {
+                        bestVal = val;
+                        bestY = y;
+                    }
+                    if(debug)console.log("y:" + y,val,bestVal,bestY);
+                }
+                if(bestVal == 0)
+                {
+                    return false;
+                }
+                if(debug)
+                {
+                    // console.log("early",1/bestVal,bestY,x)
+                    // Matrix.logMat(proccesingMat,4);
+                    // console.log("\n\n");
+                }
+                proccesingMat.addScaleRow((1-iiVal)/bestVal,bestY,x)
+                dst.addScaleRow((1-iiVal)/bestVal,bestY,x);
+            }
+            if(debug)
+            {
+                // console.log("start",x)
+                // Matrix.logMat(proccesingMat,4);
+                // console.log("\n\n");
+            }
+
+            //Clear column below
+            for(let y = x+1; y < this.width; y++)
+            {
+                let val = proccesingMat.getItem(x,y);
+                proccesingMat.addScaleRow(-val,x,y);
+                // console.log(val)
+                dst.addScaleRow(-val,x,y);
+            }
+        }
+
+        //Top half
+        for(let x = 0; x < this.width; x++)
+        {
+            for(let y = x-1; y >= 0; y--)
+            {
+                let val = proccesingMat.getItem(x,y);
+                proccesingMat.addScaleRow(-val,x,y);
+                dst.addScaleRow(-val,x,y);
+            }
+        }
+
+        return true;
+    }
+
     get size()
     {
         return this.height;
